@@ -10,7 +10,7 @@ Costhook is a web application for monitoring costs across different providers. T
 
 - **Backend**: Python 3.13+ with FastAPI
 - **Frontend**: React 19 + TypeScript + Vite (Node.js 22+)
-- **Database & Auth**: Supabase (PostgreSQL + Auth)
+- **Database & Auth**: Supabase (PostgreSQL + Auth), async via SQLAlchemy `AsyncSession` + `psycopg_async`
 - **Python Package Manager**: uv
 - **Linting**: ruff (via pre-commit)
 - **Migrations**: Alembic
@@ -70,12 +70,12 @@ costhook/
 │   │   │   └── routes/      # API route modules (users, providers, costs, health)
 │   │   ├── core/
 │   │   │   ├── config.py    # Settings (pydantic-settings)
-│   │   │   ├── db.py        # SQLAlchemy engine and session
+│   │   │   ├── db.py        # SQLAlchemy async engine and session (psycopg_async)
 │   │   │   ├── security.py  # JWT verification (JWKS/ES256)
 │   │   │   └── crypto.py    # Credentials encryption (Fernet)
 │   │   ├── models/          # SQLAlchemy ORM models (UserProfile, Provider, CostRecord)
 │   │   ├── schemas/         # Pydantic schemas (request/response)
-│   │   └── crud/            # Database operations
+│   │   └── crud/            # Async database operations
 │   ├── alembic/
 │   │   ├── env.py           # Migration environment
 │   │   └── versions/        # Migration files
@@ -112,6 +112,15 @@ costhook/
 - `GET/PATCH/DELETE /api/v1/providers/{id}` - Provider operations
 - `GET /api/v1/costs` - List costs (with filters)
 - `GET /api/v1/health` - Health check
+
+## Database Layer
+
+- Fully async: `create_async_engine` + `async_sessionmaker` with `AsyncSession`
+- Async URL derived at runtime by replacing `postgresql+psycopg://` → `postgresql+psycopg_async://` in `app/core/db.py`
+- All CRUD functions are `async def` and `await` all DB operations
+- All route handlers are `async def`
+- Dependency `SessionDep` provides `AsyncSession` via `get_db()` async generator
+- Alembic migrations remain sync (DDL-only, run rarely)
 
 ## Auth Flow
 
