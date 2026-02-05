@@ -13,7 +13,7 @@ router = APIRouter()
 
 
 @router.get("", response_model=list[CostRecordResponse])
-def list_costs(
+async def list_costs(
     db: SessionDep,
     user_profile: CurrentUserProfile,
     provider_id: Annotated[uuid.UUID | None, Query()] = None,
@@ -28,4 +28,4 @@ def list_costs(
         start_date=start_date,
         end_date=end_date,
     )
-    return cost_crud.get_by_user(db, user_profile.id, filters)
+    return await cost_crud.get_by_user(db, user_profile.id, filters)

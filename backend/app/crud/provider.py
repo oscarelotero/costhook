@@ -1,23 +1,24 @@
 import uuid
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.crypto import encrypt_credentials
 from app.models.provider import Provider
 from app.schemas.provider import ProviderCreate, ProviderUpdate
 
 
-def get(db: Session, provider_id: uuid.UUID) -> Provider | None:
-    return db.get(Provider, provider_id)
+async def get(db: AsyncSession, provider_id: uuid.UUID) -> Provider | None:
+    return await db.get(Provider, provider_id)
 
 
-def get_by_user(db: Session, user_id: uuid.UUID) -> list[Provider]:
+async def get_by_user(db: AsyncSession, user_id: uuid.UUID) -> list[Provider]:
     stmt = select(Provider).where(Provider.user_id == user_id).order_by(Provider.created_at.desc())
-    return list(db.execute(stmt).scalars().all())
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
 
 
-def create(db: Session, user_id: uuid.UUID, provider_in: ProviderCreate) -> Provider:
+async def create(db: AsyncSession, user_id: uuid.UUID, provider_in: ProviderCreate) -> Provider:
     provider = Provider(
         user_id=user_id,
         name=provider_in.name,
@@ -25,12 +26,12 @@ def create(db: Session, user_id: uuid.UUID, provider_in: ProviderCreate) -> Prov
         credentials_encrypted=encrypt_credentials(provider_in.credentials),
     )
     db.add(provider)
-    db.commit()
-    db.refresh(provider)
+    await db.commit()
+    await db.refresh(provider)
     return provider
 
 
-def update(db: Session, provider: Provider, provider_in: ProviderUpdate) -> Provider:
+async def update(db: AsyncSession, provider: Provider, provider_in: ProviderUpdate) -> Provider:
     update_data = provider_in.model_dump(exclude_unset=True)
 
     if "credentials" in update_data:
@@ -41,11 +42,11 @@ def update(db: Session, provider: Provider, provider_in: ProviderUpdate) -> Prov
     for field, value in update_data.items():
         setattr(provider, field, value)
 
-    db.commit()
-    db.refresh(provider)
+    await db.commit()
+    await db.refresh(provider)
     return provider
 
 
-def delete(db: Session, provider: Provider) -> None:
-    db.delete(provider)
-    db.commit()
+async def delete(db: AsyncSession, provider: Provider) -> None:
+    await db.delete(provider)
+    await db.commit()

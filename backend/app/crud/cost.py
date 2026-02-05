@@ -1,14 +1,14 @@
 import uuid
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.provider import CostRecord, Provider
 from app.schemas.cost import CostFilters, CostRecordCreate
 
 
-def get_by_user(
-    db: Session,
+async def get_by_user(
+    db: AsyncSession,
     user_id: uuid.UUID,
     filters: CostFilters | None = None,
 ) -> list[CostRecord]:
@@ -29,21 +29,22 @@ def get_by_user(
         if filters.end_date:
             stmt = stmt.where(CostRecord.period_end <= filters.end_date)
 
-    return list(db.execute(stmt).scalars().all())
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
 
 
-def create(db: Session, cost_in: CostRecordCreate) -> CostRecord:
+async def create(db: AsyncSession, cost_in: CostRecordCreate) -> CostRecord:
     cost = CostRecord(**cost_in.model_dump())
     db.add(cost)
-    db.commit()
-    db.refresh(cost)
+    await db.commit()
+    await db.refresh(cost)
     return cost
 
 
-def create_many(db: Session, costs: list[CostRecordCreate]) -> list[CostRecord]:
+async def create_many(db: AsyncSession, costs: list[CostRecordCreate]) -> list[CostRecord]:
     records = [CostRecord(**cost.model_dump()) for cost in costs]
     db.add_all(records)
-    db.commit()
+    await db.commit()
     for record in records:
-        db.refresh(record)
+        await db.refresh(record)
     return records

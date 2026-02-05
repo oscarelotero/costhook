@@ -1,7 +1,11 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from app.core.config import settings
 
-engine = create_engine(settings.DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Derive async connection URL from the sync one
+async_database_url = settings.DATABASE_URL.replace(
+    "postgresql+psycopg://", "postgresql+psycopg_async://"
+)
+
+engine = create_async_engine(async_database_url)
+AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
