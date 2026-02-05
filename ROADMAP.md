@@ -3,23 +3,25 @@
 ## Phase 1: Core Infrastructure
 
 ### Backend
-- [ ] User model and profile endpoints (GET/PATCH /api/v1/users/me)
-- [ ] Provider model (id, user_id, type, name, credentials, status, created_at)
-- [ ] Provider CRUD endpoints (POST/GET/PATCH/DELETE /api/v1/providers)
-- [ ] Secure credentials storage (encrypt API keys at rest)
-- [ ] Cost record model (id, provider_id, amount, currency, service, period_start, period_end, metadata)
-- [ ] Cost records endpoints (GET /api/v1/costs with filters)
+- [x] User model and profile endpoints (GET/PATCH /api/v1/users/me)
+- [x] Provider model (id, user_id, type, name, credentials, status, created_at)
+- [x] Provider CRUD endpoints (POST/GET/PATCH/DELETE /api/v1/providers)
+- [x] Secure credentials storage (encrypt API keys at rest)
+- [x] Cost record model (id, provider_id, amount, currency, service, period_start, period_end, metadata)
+- [x] Cost records endpoints (GET /api/v1/costs with filters)
+- [x] JWT verification via JWKS (asymmetric ES256 keys, no shared secret)
 
 ### Frontend
-- [ ] User settings page (profile, password change)
-- [ ] Provider management page (list, add, edit, delete providers)
-- [ ] Add provider form with type-specific fields
-- [ ] Provider connection status indicator
+- [x] User settings page (profile, password change)
+- [x] Provider management page (list, add, edit, delete providers)
+- [x] Add provider form with type-specific fields
+- [x] Provider connection status indicator
 
 ### Database
-- [ ] Initial Alembic migration for users extension (profile fields)
-- [ ] Migration for providers table
-- [ ] Migration for cost_records table
+- [x] Initial Alembic migration for users extension (profile fields)
+- [x] Migration for providers table
+- [x] Migration for cost_records table
+- [x] Enable RLS on all tables
 
 ---
 

@@ -71,7 +71,7 @@ costhook/
 │   │   ├── core/
 │   │   │   ├── config.py    # Settings (pydantic-settings)
 │   │   │   ├── db.py        # SQLAlchemy engine and session
-│   │   │   ├── security.py  # JWT verification
+│   │   │   ├── security.py  # JWT verification (JWKS/ES256)
 │   │   │   └── crypto.py    # Credentials encryption (Fernet)
 │   │   ├── models/          # SQLAlchemy ORM models (UserProfile, Provider, CostRecord)
 │   │   ├── schemas/         # Pydantic schemas (request/response)
@@ -116,6 +116,7 @@ costhook/
 ## Auth Flow
 
 - Frontend handles auth via Supabase JS SDK (`@supabase/supabase-js`)
-- Backend verifies Supabase JWT tokens using `pyjwt`
+- Backend verifies Supabase JWT tokens using `pyjwt` with JWKS (asymmetric ES256 keys fetched from `SUPABASE_URL/auth/v1/.well-known/jwks.json`)
+- No shared JWT secret needed — verification uses public keys only
 - Protected routes use `CurrentUserProfile` dependency from `app/api/deps.py`
 - Provider credentials encrypted with Fernet (ENCRYPTION_KEY env var)

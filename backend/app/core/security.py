@@ -3,16 +3,17 @@ from fastapi import HTTPException, status
 
 from app.core.config import settings
 
-ALGORITHM = "HS256"
+jwks_client = jwt.PyJWKClient(f"{settings.SUPABASE_URL}/auth/v1/.well-known/jwks.json")
 
 
 def verify_token(token: str) -> dict:
     """Verify a Supabase JWT token and return the payload."""
     try:
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
         payload = jwt.decode(
             token,
-            settings.SUPABASE_JWT_SECRET,
-            algorithms=[ALGORITHM],
+            signing_key.key,
+            algorithms=["ES256"],
             audience="authenticated",
         )
         return payload
