@@ -10,7 +10,7 @@ Costhook is a web application for monitoring costs across different providers. T
 
 - **Backend**: Python 3.13+ with FastAPI
 - **Frontend**: React 19 + TypeScript + Vite (Node.js 22+)
-- **Database**: PostgreSQL 17+
+- **Database & Auth**: Supabase (PostgreSQL + Auth)
 - **Python Package Manager**: uv
 - **Linting**: ruff (via pre-commit)
 - **Migrations**: Alembic
@@ -83,12 +83,23 @@ costhook/
 ├── frontend/
 │   ├── src/
 │   │   ├── main.tsx         # React entry point
-│   │   └── App.tsx          # Root component
+│   │   ├── App.tsx          # Root component with routing
+│   │   ├── lib/supabase.ts  # Supabase client
+│   │   ├── contexts/        # React contexts (AuthContext)
+│   │   ├── components/      # Shared components
+│   │   └── pages/           # Page components
 │   ├── public/
 │   ├── index.html
 │   ├── vite.config.ts       # Vite config (proxy to backend on /api)
 │   └── package.json
 └── README.md
 ```
+
+## Auth Flow
+
+- Frontend handles auth via Supabase JS SDK (`@supabase/supabase-js`)
+- Backend verifies Supabase JWT tokens using `pyjwt`
+- Protected routes use `CurrentUser` dependency from `app/api/deps.py`
+- JWT secret from Supabase Dashboard > Settings > API > JWT Secret
 
 API routes are versioned under `/api/v1`. Health check: `GET /api/v1/health`

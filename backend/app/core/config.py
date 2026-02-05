@@ -11,7 +11,13 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Costhook"
     API_V1_STR: str = "/api/v1"
 
-    DATABASE_URL: str = "postgresql+psycopg://localhost:5432/costhook"
+    # Supabase
+    SUPABASE_URL: str
+    SUPABASE_ANON_KEY: str
+    SUPABASE_JWT_SECRET: str
+
+    # Database (Supabase PostgreSQL connection string)
+    DATABASE_URL: str
 
 
 settings = Settings()

@@ -5,8 +5,8 @@ A web application for monitoring costs across different providers. Built for dev
 ## Tech Stack
 
 - **Backend**: Python with FastAPI
-- **Frontend**: React
-- **Database**: PostgreSQL
+- **Frontend**: React + TypeScript + Vite
+- **Database & Auth**: Supabase
 
 ## Project Structure
 
@@ -23,13 +23,21 @@ costhook/
 
 - Python 3.13+
 - Node.js 22+
-- PostgreSQL 17+
 - [uv](https://docs.astral.sh/uv/)
+- [Supabase](https://supabase.com/) account
+
+### Supabase Setup
+
+1. Create a new project at [supabase.com](https://supabase.com/)
+2. Go to Settings > API to find your project URL, anon key, and JWT secret
+3. Go to Settings > Database to find your connection string
 
 ### Backend Setup
 
 ```bash
 cd backend
+cp .env.example .env
+# Edit .env with your Supabase credentials
 uv sync
 uv run uvicorn app.main:app --reload
 ```
@@ -38,18 +46,28 @@ uv run uvicorn app.main:app --reload
 
 ```bash
 cd frontend
+cp .env.example .env
+# Edit .env with your Supabase credentials
 npm install
 npm run dev
 ```
 
-### Database
-
-Create a PostgreSQL database and configure the connection string in your environment variables.
-
 ## Environment Variables
 
+### Backend (.env)
+
 ```
-DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/costhook
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_JWT_SECRET=your-jwt-secret
+DATABASE_URL=postgresql+psycopg://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+```
+
+### Frontend (.env)
+
+```
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
 ## License
