@@ -19,5 +19,8 @@ class Settings(BaseSettings):
     # Database (Supabase PostgreSQL connection string)
     DATABASE_URL: str
 
+    # Encryption key for credentials (generate with: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
+    ENCRYPTION_KEY: str
+
 
 settings = Settings()

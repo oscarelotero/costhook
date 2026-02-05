@@ -66,12 +66,14 @@ costhook/
 │   ├── app/
 │   │   ├── main.py          # FastAPI application factory
 │   │   ├── api/
-│   │   │   ├── deps.py      # Dependency injection (SessionDep, etc.)
-│   │   │   └── routes/      # API route modules
+│   │   │   ├── deps.py      # Dependencies (SessionDep, CurrentUser, CurrentUserProfile)
+│   │   │   └── routes/      # API route modules (users, providers, costs, health)
 │   │   ├── core/
 │   │   │   ├── config.py    # Settings (pydantic-settings)
-│   │   │   └── db.py        # SQLAlchemy engine and session
-│   │   ├── models/          # SQLAlchemy ORM models
+│   │   │   ├── db.py        # SQLAlchemy engine and session
+│   │   │   ├── security.py  # JWT verification
+│   │   │   └── crypto.py    # Credentials encryption (Fernet)
+│   │   ├── models/          # SQLAlchemy ORM models (UserProfile, Provider, CostRecord)
 │   │   ├── schemas/         # Pydantic schemas (request/response)
 │   │   └── crud/            # Database operations
 │   ├── alembic/
@@ -84,10 +86,12 @@ costhook/
 │   ├── src/
 │   │   ├── main.tsx         # React entry point
 │   │   ├── App.tsx          # Root component with routing
-│   │   ├── lib/supabase.ts  # Supabase client
+│   │   ├── lib/
+│   │   │   ├── supabase.ts  # Supabase client
+│   │   │   └── api.ts       # Backend API client
 │   │   ├── contexts/        # React contexts (AuthContext)
-│   │   ├── components/      # Shared components
-│   │   └── pages/           # Page components
+│   │   ├── components/      # Shared components (Layout, ProtectedRoute)
+│   │   └── pages/           # Page components (Dashboard, Providers, Settings)
 │   ├── public/
 │   ├── index.html
 │   ├── vite.config.ts       # Vite config (proxy to backend on /api)
@@ -95,11 +99,23 @@ costhook/
 └── README.md
 ```
 
+## Data Models
+
+- **UserProfile**: Extension of Supabase auth user (display_name, timezone)
+- **Provider**: Connected service (type, name, encrypted credentials, status)
+- **CostRecord**: Cost data from providers (amount, service, period)
+
+## API Endpoints
+
+- `GET/PATCH /api/v1/users/me` - User profile
+- `GET/POST /api/v1/providers` - List/create providers
+- `GET/PATCH/DELETE /api/v1/providers/{id}` - Provider operations
+- `GET /api/v1/costs` - List costs (with filters)
+- `GET /api/v1/health` - Health check
+
 ## Auth Flow
 
 - Frontend handles auth via Supabase JS SDK (`@supabase/supabase-js`)
 - Backend verifies Supabase JWT tokens using `pyjwt`
-- Protected routes use `CurrentUser` dependency from `app/api/deps.py`
-- JWT secret from Supabase Dashboard > Settings > API > JWT Secret
-
-API routes are versioned under `/api/v1`. Health check: `GET /api/v1/health`
+- Protected routes use `CurrentUserProfile` dependency from `app/api/deps.py`
+- Provider credentials encrypted with Fernet (ENCRYPTION_KEY env var)
